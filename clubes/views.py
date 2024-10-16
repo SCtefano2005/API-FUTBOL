@@ -48,7 +48,25 @@ class DepartamentoDetailView(APIView):
 
 class ClubListView(APIView):
     def get(self, request):
+        departamento = request.GET.get('departamento', None)
+        nombre = request.GET.get('nombre', None)
+        estadio = request.GET.get('estadio', None)
+        fecha_fundacion_inicio = request.GET.get('fecha_fundacion_inicio', None)
+        fecha_fundacion_fin = request.GET.get('fecha_fundacion_fin', None)
+
         clubes = Club.objects.all()
+
+        if departamento:
+            clubes = clubes.filter(departamento__nombre__icontains=departamento)  # Filtrar por nombre del departamento
+        if nombre:
+            clubes = clubes.filter(nombre__icontains=nombre)  # Filtrar por nombre del club
+        if estadio:
+            clubes = clubes.filter(estadio__icontains=estadio)  # Filtrar por nombre del estadio
+        if fecha_fundacion_inicio:
+            clubes = clubes.filter(fecha_fundacion__gte=fecha_fundacion_inicio)  # Filtrar por fecha de fundación desde
+        if fecha_fundacion_fin:
+            clubes = clubes.filter(fecha_fundacion__lte=fecha_fundacion_fin)  # Filtrar por fecha de fundación hasta
+
         serializer = ClubDetailSerializer(clubes, many=True)
         return Response(serializer.data)
 
